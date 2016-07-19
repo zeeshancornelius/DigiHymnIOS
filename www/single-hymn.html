@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+        <script src="js/jquery-1.10.0.min.js" type="text/javascript"></script>
+        <script type="text/javascript" charset="utf-8">
+        // Wait for device API libraries to load
+        document.addEventListener("deviceready", onDeviceReady, false);
+        // device APIs are available
+        function onDeviceReady() {
+        }
+        // Audio player
+        var my_media = null;
+        var mediaTimer = null;
+        // Play audio
+        function playAudio(el) {
+            if($(el).hasClass("active")){
+                my_media.pause();
+                $(el).addClass("pause");
+                $(el).removeClass("active");
+            }else if($(el).hasClass("pause")){
+                my_media.play();
+                $(el).removeClass("play");
+                $(el).removeClass("pause");
+                $(el).addClass("active");
+            }else{
+                // Create Media object from src
+                if (my_media) {
+                    my_media.stop();
+                    mediaTimer = null;
+                    my_media = null;
+                    $(el).next('div').removeClass("active");
+                    $(el).next('div').addClass("play");
+                    
+                }else{
+                    
+                    $(el).addClass("active");
+                    $(el).removeClass("play");
+                    var src = $(el).attr('src');
+                    my_media = new Media(src, onSuccess, onError);
+                    // Play audio
+                    my_media.play();
+                    // Update my_media position every second
+                    if (mediaTimer == null) {
+                        mediaTimer = setInterval(function() {
+                            // get my_media position
+                            my_media.getCurrentPosition(
+                                // success callback
+                                function(position) {
+                                    if (position > -1) {
+                                        setAudioPosition((position) + " sec");
+                                    }
+                                },
+                                // error callback
+                                function(e) {
+                                    console.log("Error getting pos=" + e);
+                                    setAudioPosition("Error: " + e);
+                                }
+                            );
+                        }, 1000);
+                    }
+                }
+                
+            }
+            
+        }
+        // Pause audio
+        function pauseAudio() {
+            if (my_media) {
+                my_media.pause();
+            }
+        }
+        // Set audio volume
+        function setVolume(el) {
+            if($(el).attr("id") == "mute"){
+                $(el).removeAttr('id');
+                $(el).text('Unmute');
+                if (my_media) {
+                    my_media.setVolume(0.0);
+                }
+            }else{
+                $(el).attr('id', 'mute');
+                $(el).text('Mute');
+                if (my_media) {
+                    my_media.setVolume(1.0);
+                }
+            }
+        }
+        // Stop audio
+        function stopAudio() {
+            if (my_media) {
+                my_media.stop();
+            }
+            clearInterval(mediaTimer);
+            mediaTimer = null;
+        }
+        // onSuccess Callback
+        function onSuccess() {
+            console.log("playAudio():Audio Success");
+        }
+        // onError Callback
+        function onError(error) {
+            alert('code: '    + error.code    + '\n' +
+                  'message: ' + error.message + '\n');
+        }
+        // Set audio position
+        function setAudioPosition(position) {
+            document.getElementById('audio_position').innerHTML = position;
+        }
+
+        //Share with Facebook
+        function shareFB(){
+            facebookConnectPlugin.showDialog(
+                {
+                    method: "feed",
+                    picture:'http://dostechnologies.com/demos/digiHymn/assets/ICON.png',
+                    name:'',
+                    message:'',
+                    caption: 'Listening to '+$("#hymn-title").html(),
+                    description: 'Listen to worlds greatest hymns and read lyrics in multople languages',
+                },
+                function (response) { alert(JSON.stringify(response)) },
+                function (response) { alert(JSON.stringify(response)) }
+            )
+        }
+        </script>
+        <link rel="shortcut icon" href="images/favicon.html" type="image/x-icon" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <link href='http://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700|Open+Sans:400,700' rel='stylesheet' type='text/css' />
+
+        <link rel="stylesheet" href="css/bootstrap.css" />
+        <link rel="stylesheet" href="css/style.css" />
+        <style>
+            .fadeOpa{
+                opacity: 0.2;
+                background: #333 url('../www/images/loading.gif') no-repeat 50% 50%;
+            }
+            .heightMan{
+                height: 500px;
+            }
+        </style>
+    </head>
+    <body>
+       <div class="content content-wrap container-fluid nopadding">
+            <div class="header  opacity"  id="fixed_header">
+                <div class="row">
+                    <div class="col-lg-2 col-md-4 col-sm-4">
+                            <div class="logo">
+                                <h1><a href="index.html"><img src="images/digihymn-logo.png" alt="Lovers Logotype" /></a></h1>
+                                <h2 class="slogan logo-slogan">The Love For Hymns</h2>
+                            </div>
+                    </div>
+                </div>
+            </div>
+                <div class="wrap nav-main isDown opacity" id="navigation">
+                        <div class="nav-overlay" id="nav_overlay" style="display:none">
+                            <div class="nav-button transition">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <nav style = "padding-top: 100px;">
+                            <ul>
+                                <li>
+                                    <a onclick = "window.open('index.html','_self');">Home</a>
+                                </li>
+                                <li>
+                                    <a id = "sign"></a>
+                                </li>
+                                <li>
+                                    <a onclick = "window.open('all-hymns.html','_self');">All Hymns</a>
+                                </li>
+                                <li>
+                                    <a onclick = "window.open('register.html','_self');">Register</a>
+                                </li>
+                            </ul>
+                        </nav>
+                        <div>
+                            <footer>
+                                <div class="social">
+                                    <ul class="social-list">
+                                        <li class="youtube">
+                                            <a href="#"></a>
+                                        </li>
+                                        <li class="soundcloud">
+                                            <a href="#"></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="copy copyright">
+                                    <p>&copy; Copyright 2016 DIGIHYMN.</p>
+                                </div>
+                            </footer>
+                        </div>
+                </div>
+            <div class="content-main main-albums">
+                    <header>
+                        <h2 class="main-header entry-header opacity">
+                            <a id = "hymn-title" href="#"></a>
+                        </h2>
+                    </header>
+                    <section class="content-section release-section extend">
+                        <div class="wrap content-release opacity extend">
+                            <div class="container-fluid extend">
+                                <div class="row extend">
+                                    <span class="extend-col extend-left"></span>
+                                    <div class="col-lg-3">
+                                        <header>
+                                            <div class="">
+                                                <div style="width:100%;">
+                                                    <select onchange = "transShow(this)"  class = "comments-line" name="posChurch" style = "height:30px; background: transparent;color:white; float: right" >
+                                                        <option>Translate</option>
+                                                        <option value = "2">Roman Urdu</option>
+                                                        <option value = "1">Urdu</option>
+                                                    </select>
+                                                </div>
+                                            </div>  
+                                        </header>
+                                    </div>
+                                    <p class="text-center">
+                                        <a onclick="shareFB()">
+                                            <img src = "http://icons.iconarchive.com/icons/danleech/simple/512/facebook-icon.png"
+                                            style = "width : 25px; height : 25px"/>
+                                            <span class="facebook">Share on Facebook</span>
+                                        </a> 
+                                    </p>
+                                    <div id = "player-div" style = "margin-top: 30px;">
+                                        <div class="jp-audio"><div class="jp-controls-wrap" style="margin-left:22px"><div class="jp-controls" id=""><div id="audi" class="jp-prev jp-control" src="" onclick="playAudio(this)"></div><div class="play audi" src="" onclick="playAudio(this)"></div><div class="jp-vol" style = "margin-top:27px; color: white" onclick="setVolume(this);" id="mute" >Mute</div></div></div></div></div>
+                                    </div>
+                                    <div id = "phrase-div" class="col-lg-5 text-center heightMan" style = "margin-top: 50px;">
+                                        <h4 id = "fetching">Fetching Lyrics ...</h4>
+                                    </div>
+                            </div>
+                        </div>
+                    </section>
+            </div>
+        </div>
+        <script src="js/bootstrap.js" type="text/javascript"></script>
+        <script src="js/jquery-ui.js" type="text/javascript"></script>
+        <script src="js/jquery.jplayer.min.js" type="text/javascript"></script>
+        <script type="text/javascript" src="js/plugins.js"></script>
+        <script src="js/common.js" type="text/javascript"></script>
+        <script>
+            $(document).ready(function(){
+                $("#phrase-div").addClass("fadeOpa");
+                $("#hymn-title").text(window.localStorage.getItem("hymn_title"));
+                $(".audi").attr("src" , window.localStorage.getItem("hymn_link"));
+                var obj = {
+                        hymn_id : window.localStorage.getItem("hymn_id"),
+                        user_id : window.localStorage.getItem("user_id")
+                    };
+                $.ajax({
+                        type : 'post',
+                        data : obj,
+                        url : 'http://dostechnologies.com/demos/digiHymn/Hymn/hymn_phrase_for_app',
+                        xhrFields: 
+                            {
+                                onprogress: function (e) {
+                                    if (e.lengthComputable) {
+                                        var comp = e.loaded / e.total * 100;
+                                        console.log(comp);
+                                        if(comp == 100){
+                                        }       
+                                    }
+                                }
+                            },
+                        success : function(response){
+                            $("#phrase-div").removeClass("fadeOpa");
+                            $("#phrase-div").removeClass("heightMan");
+                            $("#fetching").remove();
+                            var col = '<p></p><div id = "phrase"'+phraseCounter+'></div>';
+                            var colu = '<td colspan="3"><h4>Lyrics</h4>';
+                            var phrases = jQuery.parseJSON(response);
+                            var phraseCounter = 0;
+                            for (i = 0; i < phrases.length; i++) {
+                                phraseCounter++;
+                                var col = '<br><br><br><p>'+phrases[i].text+'</p><div id = "phrase'+phraseCounter+'"></div>';
+                                $("#phrase-div").append(col);
+                                
+                                var obj1 = {
+                                        phrase_id : phrases[i].id,
+                                        user_id : window.localStorage.getItem("user_id")
+                                    };
+
+                                $.ajax({
+                                    type : 'post',
+                                    data : obj1,
+                                    async : false,
+                                    url : 'http://dostechnologies.com/demos/digiHymn/Hymn/hymn_phrase_trans_for_app',
+                                    success : function(res){
+                                        var translations = jQuery.parseJSON(res);
+                                            for (x = 0; x < translations.length; x++) {
+                                                colu = '<div class = "hidden '+translations[x].language_id+'"><h3>Tranlsation</h3><p>'+translations[x].text+'</p></div>'
+                                                $("#phrase"+phraseCounter).append(colu);
+                                            }
+                                    }
+                                });
+                            }
+                        },
+                        failure : function(){
+                            alert("internal error");
+                        }
+                    });
+
+            });
+            
+            function transShow(el){
+                var clas = $(el).val();
+                if(clas == 1){
+                    $(".1").removeClass("hidden");
+                    $(".2").addClass("hidden");
+                }else if(clas == 2){
+                    $(".2").removeClass("hidden");
+                    $(".1").addClass("hidden");
+                }else{
+                    $(".2").addClass("hidden");
+                    $(".1").addClass("hidden");
+                }
+            }
+            
+        </script>
+        <script>
+            if(window.localStorage.getItem("user_id") != null){
+                $("#sign").text(window.localStorage.getItem("user_name"));
+                $("#sign").attr("page", "profile.html");
+            }else{
+                $("#sign").text("Sign In");
+                $("#sign").attr("page", "sign-in.html");
+            }
+            $("#sign").click(function(){
+                window.open($(this).attr("page"),'_self');
+            });
+        </script>
+    </body>
+</html>

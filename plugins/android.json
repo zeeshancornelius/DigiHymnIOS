@@ -1,0 +1,30 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "cordova-plugin-media": {
+            "PACKAGE_NAME": "com.cornelius.digihymn"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.cornelius.digihymn"
+        },
+        "phonegap-facebook-plugin": {
+            "APP_ID": "1643745165951168",
+            "APP_NAME": "digihymn",
+            "PACKAGE_NAME": "com.cornelius.digihymn"
+        }
+    },
+    "dependent_plugins": {
+        "cordova-plugin-compat": {
+            "PACKAGE_NAME": "com.cornelius.digihymn"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.cornelius.digihymn"
+        }
+    }
+}
